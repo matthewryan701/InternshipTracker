@@ -19,10 +19,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-      
-      - name: Install Playwright browser
-        run: python -m playwright install chromium --with-deps
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install chromium
 
       # Restore the state file from the previous run (so we don't re-alert)
       - name: Restore seen-internships cache
