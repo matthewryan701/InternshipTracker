@@ -41,6 +41,13 @@ def scrape_listings() -> list[dict]:
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(TARGET_URL, wait_until="networkidle")
+        
+        # Wait until at least one table row is visible (up to 15 seconds)
+        try:
+            page.wait_for_selector("tr.border", timeout=15000)
+        except:
+            print("DEBUG: Timed out waiting for rows — page may require login or selectors are wrong")
+        
         html = page.content()
         browser.close()
 
