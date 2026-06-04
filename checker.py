@@ -40,22 +40,26 @@ def scrape_listings() -> list[dict]:
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
-        page.goto(TARGET_URL, wait_until="networkidle")  # waits for JS to finish
+        page.goto(TARGET_URL, wait_until="networkidle")
         html = page.content()
         browser.close()
 
     soup = BeautifulSoup(html, "html.parser")
-    items = []
 
-    for el in soup.select(LISTINGS_SELECTOR):
-        if not el.select_one("td.bg-blue-300"):
-            continue
+    # Debug: print how many rows were found at each stage
+    all_rows = soup.select(LISTINGS_SELECTOR)
+    print(f"DEBUG: Total rows matching '{LISTINGS_SELECTOR}': {len(all_rows)}")
+
+    open_rows = [el for el in all_rows if el.select_one("td.bg-blue-300")]
+    print(f"DEBUG: Rows with opening date (bg-blue-300): {len(open_rows)}")
+
+    items = []
+    for el in open_rows:
         title_el = el.select_one(TITLE_SELECTOR)
         link_el  = el.select_one(LINK_SELECTOR)
-
         title = title_el.get_text(strip=True) if title_el else el.get_text(strip=True)
         href  = link_el["href"] if link_el and link_el.get("href") else TARGET_URL
-
+        print(f"DEBUG: Found listing: {title}")
         items.append({"id": make_id(title), "title": title, "url": href})
 
     return items
