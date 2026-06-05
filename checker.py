@@ -42,18 +42,18 @@ def scrape_listings() -> list[dict]:
         page = browser.new_page()
         page.goto(TARGET_URL, wait_until="networkidle")
         
-        # Wait until at least one table row is visible (up to 15 seconds)
-        try:
-            page.wait_for_selector("tr.border", timeout=15000)
-        except:
-            print("DEBUG: Timed out waiting for rows — page may require login or selectors are wrong")
+        # Wait an extra 5 seconds for JS to finish rendering
+        page.wait_for_timeout(5000)
         
         html = page.content()
         browser.close()
 
     soup = BeautifulSoup(html, "html.parser")
 
-    # Debug: print how many rows were found at each stage
+    # Debug: print a snippet of the HTML so we can see what's there
+    print("DEBUG: HTML snippet:")
+    print(soup.body.get_text()[:500] if soup.body else "No body found")
+
     all_rows = soup.select(LISTINGS_SELECTOR)
     print(f"DEBUG: Total rows matching '{LISTINGS_SELECTOR}': {len(all_rows)}")
 
