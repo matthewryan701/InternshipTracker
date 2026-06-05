@@ -6,8 +6,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # ── Configuration ────────────────────────────────────────────────────────────
-# The API endpoint that returns all internship listings as JSON
-API_URL = "https://api.the-trackr.com/programmes?region=UK&industry=Finance&season=2027&type=summer-internships"
+API_URLS = [
+    "https://api.the-trackr.com/programmes?region=UK&industry=Finance&season=2027&type=summer-internships",
+    "https://api.the-trackr.com/programmes?region=UK&industry=Tech&season=2026&type=summer-internships",
+]
 
 STATE_FILE = "seen_internships.json"
 # ─────────────────────────────────────────────────────────────────────────────
@@ -25,12 +27,17 @@ def save_seen(seen: set):
         json.dump(list(seen), f)
 
 
-def fetch_listings() -> list[dict]:
-    """Fetch all listings from the Trackr API."""
+def fetch_all_listings() -> list[dict]:
+    """Fetch listings from all configured API URLs and combine them."""
     headers = {"User-Agent": "Mozilla/5.0 (compatible; InternshipBot/1.0)"}
-    resp = requests.get(API_URL, headers=headers, timeout=15)
-    resp.raise_for_status()
-    return resp.json()
+    all_listings = []
+    for url in API_URLS:
+        resp = requests.get(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+        listings = resp.json()
+        print(f"DEBUG: Fetched {len(listings)} listings from {url}")
+        all_listings.extend(listings)
+    return all_listings
 
 
 def is_open(listing: dict) -> bool:
@@ -57,15 +64,17 @@ def send_email(new_listings: list[dict]):
 
     html_rows = ""
     for item in new_listings:
-        company = item.get("company", {}).get("name", "Unknown")
-        title   = item.get("name", "Untitled")
-        url     = item.get("url") or item.get("company", {}).get("careersSite", "https://the-trackr.com")
+        company  = item.get("company", {}).get("name", "Unknown")
+        title    = item.get("name", "Untitled")
+        url      = item.get("url") or item.get("company", {}).get("careersSite", "https://the-trackr.com")
+        industry = item.get("industry", "")
         html_rows += (
             f'<tr>'
             f'<td style="padding:8px 4px;border-bottom:1px solid #eee;font-weight:600">{company}</td>'
             f'<td style="padding:8px 4px;border-bottom:1px solid #eee;">'
             f'<a href="{url}" style="color:#2563eb;text-decoration:none;">{title}</a>'
             f'</td>'
+            f'<td style="padding:8px 4px;border-bottom:1px solid #eee;color:#888;font-size:12px;">{industry}</td>'
             f'</tr>'
         )
 
@@ -99,12 +108,12 @@ def send_email(new_listings: list[dict]):
 
 
 def main():
-    seen     = load_seen()
-    listings = fetch_listings()
+    seen         = load_seen()
+    all_listings = fetch_all_listings()
 
     # Only care about listings that are currently open
-    open_listings = [l for l in listings if is_open(l)]
-    print(f"DEBUG: Total listings from API: {len(listings)}")
+    open_listings = [l for l in all_listings if is_open(l)]
+    print(f"DEBUG: Total listings across all sources: {len(all_listings)}")
     print(f"DEBUG: Open listings (have openingDate): {len(open_listings)}")
 
     # Find ones we haven't seen before
@@ -113,10 +122,12 @@ def main():
 
     if new:
         for l in new:
-            print(f"  → {l.get('company', {}).get('name')} — {l.get('name')}")
+            print(f"  → [{l.get('industry')}] {l.get('company', {}).get('name')} — {l.get('name')}")
         send_email(new)
+    else:
+        print("No new listings found.")
 
-    # Save ALL currently open IDs (so stale ones drop off naturally)
+    # Save ALL currently open IDs
     save_seen({l["id"] for l in open_listings})
 
 
