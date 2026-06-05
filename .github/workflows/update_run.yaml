@@ -2,8 +2,8 @@ name: Internship Tracker
 
 on:
   schedule:
-    - cron: "0 */4 * * *"   # Runs every 4 hours
-  workflow_dispatch:          # Allows manual runs from the Actions tab
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
 
 jobs:
   check-internships:
@@ -21,13 +21,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Restore seen-internships cache
-        uses: actions/cache@v4
-        with:
-          path: seen_internships.json
-          key: seen-internships-${{ runner.os }}
-          restore-keys: seen-internships-
-
       - name: Run checker
         env:
           EMAIL_SENDER:    ${{ secrets.EMAIL_SENDER }}
@@ -35,9 +28,10 @@ jobs:
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         run: python checker.py
 
-      - name: Save seen-internships cache
-        uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: seen_internships.json
-          key: seen-internships-${{ runner.os }}-${{ github.run_id }}
+      - name: Commit seen internships
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_internships.json
+          git diff --staged --quiet || git commit -m "Update seen internships"
+          git push
