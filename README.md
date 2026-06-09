@@ -1,6 +1,6 @@
 # Internship Tracker
 
-Checks the Trackr API every 4 hours via GitHub Actions and emails you when new internship listings or events open up. Currently monitors UK Finance, UK Tech, and EU Finance across both internships and events.
+Checks the Trackr API every hour via GitHub Actions and emails you when new internship listings or events open up. Currently monitors UK Finance, UK Tech, and EU Finance across both internships and events.
 
 ---
 
