@@ -55,7 +55,7 @@ def send_email(new_listings: list[dict]):
     sender    = os.environ["EMAIL_SENDER"]
     password  = os.environ["EMAIL_PASSWORD"]
     recipient = os.environ["EMAIL_RECIPIENT"]
-    smtp_host = os.environ.get("SMTP_HOST", "smtp.office365.com")
+    smtp_host = os.environ.get("SMTP_HOST", "smtp-relay.brevo.com")
     smtp_port = int(os.environ.get("SMTP_PORT", "587"))
 
     subject = f"{len(new_listings)} New Internship(s) Open on Trackr!"
