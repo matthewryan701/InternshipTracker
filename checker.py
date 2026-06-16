@@ -55,10 +55,10 @@ def send_email(new_listings: list[dict]):
     sender    = os.environ["EMAIL_SENDER"]
     password  = os.environ["EMAIL_PASSWORD"]
     recipient = os.environ["EMAIL_RECIPIENT"]
-    smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    smtp_host = os.environ.get("SMTP_HOST", "smtp.office365.com")
     smtp_port = int(os.environ.get("SMTP_PORT", "587"))
 
-    subject = f"🎉 {len(new_listings)} New Internship(s) Open on Trackr!"
+    subject = f"{len(new_listings)} New Internship(s) Open on Trackr!"
 
     text_lines = ["The following internships just opened on Trackr:\n"]
     for item in new_listings:
@@ -86,7 +86,7 @@ def send_email(new_listings: list[dict]):
 
     html_body = f"""
     <html><body style="font-family:sans-serif;color:#111;max-width:640px;margin:auto;">
-      <h2 style="color:#2563eb;">🎉 {len(new_listings)} New Internship(s) Now Open</h2>
+      <h2 style="color:#2563eb;">{len(new_listings)} New Internship(s) Now Open</h2>
       <p>The following listings just became available on
          <a href="https://the-trackr.com">the-trackr.com</a>:</p>
       <table style="width:100%;border-collapse:collapse;">{html_rows}</table>
