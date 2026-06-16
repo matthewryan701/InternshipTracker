@@ -107,7 +107,7 @@ def send_email(new_listings: list[dict]):
     with smtplib.SMTP(smtp_host, smtp_port) as server:
         server.ehlo()
         server.starttls()
-        server.login(sender, password)
+        server.login(smtp_login, password)
         server.sendmail(sender, recipient, msg.as_string())
 
     print(f"✉️  Email sent with {len(new_listings)} new listing(s).")
