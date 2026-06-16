@@ -53,6 +53,7 @@ def is_open(listing: dict) -> bool:
 
 def send_email(new_listings: list[dict]):
     sender    = os.environ["EMAIL_SENDER"]
+    smtp_login = os.environ["SMTP_LOGIN"]
     password  = os.environ["EMAIL_PASSWORD"]
     recipient = os.environ["EMAIL_RECIPIENT"]
     smtp_host = os.environ.get("SMTP_HOST", "smtp-relay.brevo.com")
