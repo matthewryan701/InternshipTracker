@@ -11,8 +11,8 @@ API_URLS = [
     "https://api.the-trackr.com/programmes?region=UK&industry=Finance&season=2027&type=summer-internships",
     "https://api.the-trackr.com/programmes?region=UK&industry=Finance&season=2027&type=events",
     # UK Tech
-    "https://api.the-trackr.com/programmes?region=UK&industry=Tech&season=2026&type=summer-internships",
-    "https://api.the-trackr.com/programmes?region=UK&industry=Tech&season=2026&type=events",
+    "https://api.the-trackr.com/programmes?region=UK&industry=Tech&season=2027&type=summer-internships",
+    "https://api.the-trackr.com/programmes?region=UK&industry=Tech&season=2027&type=events",
     # EU Finance
     "https://api.the-trackr.com/programmes?region=EU&industry=Finance&season=2026&type=summer-internships",
 ]
