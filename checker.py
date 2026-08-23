@@ -42,6 +42,9 @@ def fetch_all_listings() -> list[dict]:
         resp.raise_for_status()
         listings = resp.json()
         print(f"DEBUG: Fetched {len(listings)} listings from {url}")
+        # Ensure all items are dictionaries, filter out any strings or non-dict items
+        listings = [l for l in listings if isinstance(l, dict)]
+        print(f"DEBUG: After filtering, {len(listings)} valid listing objects")
         all_listings.extend(listings)
     return all_listings
 
