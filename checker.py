@@ -118,27 +118,39 @@ def send_email(new_listings: list[dict]):
 
 
 def main():
-    seen         = load_seen()
-    all_listings = fetch_all_listings()
+    try:
+        seen         = load_seen()
+        all_listings = fetch_all_listings()
 
-    # Only care about listings that are currently open
-    open_listings = [l for l in all_listings if is_open(l)]
-    print(f"DEBUG: Total listings across all sources: {len(all_listings)}")
-    print(f"DEBUG: Open listings (have openingDate): {len(open_listings)}")
+        # Only care about listings that are currently open
+        open_listings = [l for l in all_listings if is_open(l)]
+        print(f"DEBUG: Total listings across all sources: {len(all_listings)}")
+        print(f"DEBUG: Open listings (have openingDate): {len(open_listings)}")
 
-    # Find ones we haven't seen before
-    new = [l for l in open_listings if l["id"] not in seen]
-    print(f"DEBUG: New listings: {len(new)}")
+        # Find ones we haven't seen before
+        new = [l for l in open_listings if l["id"] not in seen]
+        print(f"DEBUG: New listings: {len(new)}")
 
-    if new:
-        for l in new:
-            print(f"  → [{l.get('industry')}] {l.get('company', {}).get('name')} — {l.get('name')}")
-        send_email(new)
-    else:
-        print("No new listings found.")
+        if new:
+            for l in new:
+                print(f"  → [{l.get('industry')}] {l.get('company', {}).get('name')} — {l.get('name')}")
+            send_email(new)
+        else:
+            print("No new listings found.")
 
-    # Save ALL currently open IDs
-    save_seen({l["id"] for l in open_listings})
+        # Save ALL currently open IDs
+        save_seen({l["id"] for l in open_listings})
+        print("Successfully saved seen internships.")
+        
+    except Exception as e:
+        print(f"ERROR: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        exit(1)
+
+
+if __name__ == "__main__":
+    main()
 
 
 if __name__ == "__main__":
