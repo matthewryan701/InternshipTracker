@@ -38,23 +38,11 @@ def fetch_all_listings() -> list[dict]:
     headers = {"User-Agent": "Mozilla/5.0 (compatible; InternshipBot/1.0)"}
     all_listings = []
     for url in API_URLS:
-        try:
-            resp = requests.get(url, headers=headers, timeout=15)
-            resp.raise_for_status()
-            data = resp.json()
-            # Make sure we got a list of dicts, not an error response
-            if not isinstance(data, list):
-                print(f"WARNING: Unexpected response from {url}: {data}")
-                continue
-            valid = [item for item in data if isinstance(item, dict)]
-            if len(valid) < 10:
-                print(f"WARNING: Only {len(valid)} listings from {url} — skipping (may be rate limited)")
-                continue
-            print(f"DEBUG: Fetched {len(valid)} listings from {url}")
-            all_listings.extend(valid)
-        except Exception as e:
-            print(f"WARNING: Failed to fetch {url}: {e}")
-            continue
+        resp = requests.get(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+        listings = resp.json()
+        print(f"DEBUG: Fetched {len(listings)} listings from {url}")
+        all_listings.extend(listings)
     return all_listings
 
 
